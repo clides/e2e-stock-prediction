@@ -21,6 +21,8 @@ dvc
 
 # Utilities
 python-dotenv
+python-box==6.0.2
+ensure==1.0.2
 tqdm
 pyyaml
 joblib
@@ -28,3 +30,5 @@ joblib
 # Dev/Testing
 pytest
 httpx
+
+-e .
