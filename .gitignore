@@ -147,3 +147,4 @@ coverage/
 # System files
 *.swp
 *.swo
+*.egg-info/
