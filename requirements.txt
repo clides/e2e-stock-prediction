@@ -1,0 +1,30 @@
+# Core ML/DL
+torch
+pytorch-lightning
+
+# FastAPI & Web
+fastapi==0.95.2
+uvicorn==0.22.0
+jinja2==3.1.2  # Only if using HTML templates
+
+# Data Handling
+pandas
+numpy
+yfinance
+matplotlib
+seaborn
+scikit-learn
+
+# MLOps Tools
+mlflow==2.2.2
+dvc
+
+# Utilities
+python-dotenv
+tqdm
+pyyaml
+joblib
+
+# Dev/Testing
+pytest
+httpx
