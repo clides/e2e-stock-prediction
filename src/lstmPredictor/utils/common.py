@@ -56,19 +56,33 @@ def get_size(path: Path) -> str:
     size_in_kb = round(os.path.getsize(path)/1024)
     return size_in_kb
 
-@ensure_annotations
-def fetch_stock_data(ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
-    data = yf.download(company_name, start=start_date, end=end_date)
-    return data
-
-@ensure_annotations
-def validate_ticker(ticker: str) -> bool:
+def validate_ticker(ticker: str) -> str:
+    """Returns the validated ticker if valid, otherwise raises ValueError."""
+    ticker = str(ticker).strip().upper()
+    
+    # Basic validation
+    if not ticker.isalpha():
+        raise ValueError(f"Invalid ticker format: {ticker}. Must be alphabetic.")
+    
+    # Check if ticker exists
     try:
-        data = yf.Ticker(ticker)
-        info = data.info
-        return info.get("regularMarketPrice") is not None
+        test_data = yf.download(ticker, period="1d", progress=False)
+        if test_data.empty:
+            raise ValueError(f"No data found for ticker: {ticker}. Please check the ticker symbol.")
+        return ticker
     except Exception as e:
-        return False
+        raise ValueError(f"Failed to validate ticker {ticker}: {str(e)}")
+    
+def validate_date(start_date: str, end_date: str) -> tuple[str, str]:
+    """Validate date format and logic, returns validated start_date."""
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d")
+        end = datetime.strptime(end_date, "%Y-%m-%d")
+        if start >= end or end > datetime.now():
+            raise ValueError("start_date must be before end_date")
+        return start_date, end_date
+    except ValueError as e:
+        raise ValueError(f"Invalid date format or logic: {e}. Use YYYY-MM-DD.")
     
 @ensure_annotations
 def get_default_date_range(days_back: int = 365) -> tuple[str, str]:
