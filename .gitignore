@@ -148,3 +148,4 @@ coverage/
 *.swp
 *.swo
 *.egg-info/
+artifacts/*
