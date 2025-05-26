@@ -28,10 +28,17 @@ class StockDataIngestion:
             raise RuntimeError(f"Failed to fetch data: {str(e)}")
     
     def save_data(self, data: pd.DataFrame) -> None:
-        """Store the raw stock data using the path from config."""
+        """Store the raw stock data with only Date, Open, High, Low, Close, Volume columns."""
         try:
+            data.columns = data.columns.droplevel('Ticker')
+            data.columns.name = None
+
+            cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+            data = data[cols]
+            
             data.to_csv(self.config.csv_path)
-            print(f"Successfully saved data to {self.config.csv_path}")  # Fixed f-string
+            
+            print(f"Successfully saved {len(data)} records to {self.config.csv_path}")
         except Exception as e:
             raise RuntimeError(f"Failed to save data: {str(e)}")
         
