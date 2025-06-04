@@ -1,0 +1,11 @@
+base_model:
+  input_size: 5          # [Open, High, Low, Close, Volume]
+  hidden_size: 64
+  num_layers: 2
+  dropout: 0.2
+  bidirectional: False   # For potential future enhancement
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 100
+  sequence_length: 30    # Lookback window (days)
+  weight_decay: 1e-4     # L2 regularization
