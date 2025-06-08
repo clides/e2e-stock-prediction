@@ -7,7 +7,7 @@ from lstmPredictor.entity.entity import DataIngestionConfig
 class DataIngestionTrainingPipeline:
     def __init__(
         self,
-        ticker: str,
+        ticker: str = "AAPL",
         start_date: str = (datetime.now() - timedelta(days=365)).strftime("%Y-%m-%d"),
     ):
         """

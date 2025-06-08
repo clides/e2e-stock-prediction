@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Tuple
 
 import torch
 import torch.nn as nn
@@ -13,7 +14,7 @@ class PrepareBaseModel:
     def __init__(self, config: LSTMConfig):
         self.config = config
 
-    def build_lstm(self) -> nn.Module:
+    def build_lstm(self) -> Tuple[nn.Module, str]:
         """Builds the LSTM architecture from config"""
         try:
             model = StockLSTM(
@@ -25,9 +26,9 @@ class PrepareBaseModel:
                 self.config.bidirectional,
             )
 
-            self._save_model(model, self.config.base_model_path)
+            base_model_path = self._save_model(model, self.config.base_model_path)
 
-            return model
+            return model, base_model_path
         except Exception as e:
             logger.exception(f"Error building model: {e}")
             raise e

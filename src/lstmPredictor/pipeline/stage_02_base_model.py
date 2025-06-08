@@ -19,6 +19,6 @@ class BaseModelPipeline:
 
         base_model_config = self.config.get_base_model_config()
         preparer = PrepareBaseModel(base_model_config)
-        model = preparer.build_lstm()
+        base_model, base_model_path = preparer.build_lstm()
 
-        return model
+        return base_model, base_model_path
