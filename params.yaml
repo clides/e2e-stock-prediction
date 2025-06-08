@@ -9,3 +9,15 @@ base_model:
   epochs: 100
   sequence_length: 30    # Lookback window (days)
   weight_decay: 1e-4     # L2 regularization
+
+data_preprocessing:
+  processed_file_path: "artifacts/data/processed_data"
+  sequence_length: 30
+  train_size: 0.8
+  test_size: 0.1
+  val_size: 0.1
+  batch_size: 32
+  features: ["Open", "High", "Low", "Close", "Volume"]
+  target: "Close"
+  normalize: True
+  fill_method: "ffill"

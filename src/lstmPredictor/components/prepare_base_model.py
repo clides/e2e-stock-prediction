@@ -34,13 +34,15 @@ class PrepareBaseModel:
             raise e
 
     @staticmethod
-    def _save_model(model: StockLSTM, path: Path) -> None:
+    def _save_model(model: StockLSTM, path: Path) -> str:
         """Saves the entire model (architecture + weights)"""
         try:
             os.makedirs(path, exist_ok=True)
 
             torch.save(model, path / "base_model.pth")
             logger.info(f"Model saved to {path}")
+
+            return str(path / "base_model.pth")
         except Exception as e:
             logger.exception(f"Error saving model: {e}")
             raise e

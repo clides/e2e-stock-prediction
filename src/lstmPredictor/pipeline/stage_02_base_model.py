@@ -1,13 +1,13 @@
 from pathlib import Path
 
 from lstmPredictor.components.prepare_base_model import PrepareBaseModel
-from lstmPredictor.config.configuration import ConfigurationManager
+from lstmPredictor.config.configuration import BaseModelConfigurationManager
 
 
 class BaseModelPipeline:
     def __init__(self):
         CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        self.config = ConfigurationManager(CONFIG_PATH)
+        self.config = BaseModelConfigurationManager(CONFIG_PATH)
 
     def run(self):
         """
