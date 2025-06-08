@@ -16,12 +16,9 @@ class BaseModelPipeline:
         Returns:
             LSTM model ready for training
         """
-        logger.info(f">>>>>> {STAGE_NAME} started <<<<<<")
 
         base_model_config = self.config.get_base_model_config()
         preparer = PrepareBaseModel(base_model_config)
         model = preparer.build_lstm()
-
-        logger.info(f">>>>>> {STAGE_NAME} completed <<<<<<")
 
         return model

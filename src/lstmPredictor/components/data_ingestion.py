@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 import pandas as pd
 import yfinance as yf
@@ -15,13 +16,13 @@ class StockDataIngestion:
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(self.config.csv_path), exist_ok=True)
 
-    def fetch_data(self) -> pd.DataFrame:
+    def _fetch_data(self) -> pd.DataFrame:
         """Download stock data from Yahoo Finance using validated config."""
         try:
             data = yf.download(
                 self.config.ticker,
                 start=self.config.start_date,
-                end=self.config.end_date,
+                end=datetime.now().strftime("%Y-%m-%d"),
             )
             if data.empty:
                 raise ValueError(
@@ -31,7 +32,7 @@ class StockDataIngestion:
         except Exception as e:
             raise RuntimeError(f"Failed to fetch data: {str(e)}")
 
-    def save_data(self, data: pd.DataFrame) -> None:
+    def _save_data(self, data: pd.DataFrame) -> None:
         """Store the raw stock data with only Date, Open, High, Low, Close, Volume columns."""
         try:
             data.columns = data.columns.droplevel("Ticker")
@@ -51,6 +52,6 @@ class StockDataIngestion:
         Run the complete ingestion process.
         Returns the path where data was saved.
         """
-        data = self.fetch_data()
-        self.save_data(data)
+        data = self._fetch_data()
+        self._save_data(data)
         return self.config.csv_path

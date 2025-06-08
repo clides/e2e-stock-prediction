@@ -1,15 +1,10 @@
-Metadata-Version: 2.4
+Metadata-Version: 2.1
 Name: lstmPredictor
 Version: 0.0.0
 Summary: A small python package for regression app
 Home-page: https://github.com/clides/e2e-stock-prediction
 Author: clides
 Project-URL: Bug Tracker, https://github.com/clides/e2e-stock-prediction/issues
-Dynamic: author
-Dynamic: description
-Dynamic: home-page
-Dynamic: project-url
-Dynamic: summary
 
 # End-to-End Stock Prediction App
 

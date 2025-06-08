@@ -82,14 +82,15 @@ def validate_ticker(ticker: str) -> str:
         raise ValueError(f"Failed to validate ticker {ticker}: {str(e)}")
 
 
-def validate_date(start_date: str, end_date: str) -> tuple[str, str]:
+def validate_date(start_date: str) -> str:
     """Validate date format and logic, returns validated start_date."""
     try:
         start = datetime.strptime(start_date, "%Y-%m-%d")
-        end = datetime.strptime(end_date, "%Y-%m-%d")
-        if start >= end or end > datetime.now():
+        current_date = datetime.now()
+
+        if start >= current_date - timedelta(days=365):
             raise ValueError("start_date must be before end_date")
-        return start_date, end_date
+        return start_date
     except ValueError as e:
         raise ValueError(f"Invalid date format or logic: {e}. Use YYYY-MM-DD.")
 
