@@ -54,8 +54,8 @@ class LSTMTrainer:
 
         return optimizer_map[self.config.optimizer.lower()](
             self.model.parameters(),
-            lr=self.config.learning_rate,
-            weight_decay=self.config.weight_decay,
+            lr=float(self.config.learning_rate),
+            weight_decay=float(self.config.weight_decay),
         )
 
     def _train_epoch(self) -> float:
