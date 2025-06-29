@@ -67,16 +67,17 @@ class DataPreprocessing:
             "y_val": np.ndarray
         }
         """
-        train_split_idx = int(len(X) * (1 - self.config.val_size))
-        test_split_idx = train_split_idx + int(len(X) * (1 - self.config.test_size))
-        val_split_idx = test_split_idx + int(len(X) * (1 - self.config.val_size))
+        total_size = len(X)
+        test_size = int(total_size * self.config.test_size)
+        val_size = int(total_size * self.config.val_size)
+        train_size = total_size - test_size - val_size
 
-        X_train, y_train = X[:train_split_idx], y[:train_split_idx]
-        X_test, y_test = (
-            X[train_split_idx:test_split_idx],
-            y[train_split_idx:test_split_idx],
+        X_train, y_train = X[:train_size], y[:train_size]
+        X_val, y_val = (
+            X[train_size : train_size + val_size],
+            y[train_size : train_size + val_size],
         )
-        X_val, y_val = X[test_split_idx:val_split_idx], y[test_split_idx:val_split_idx]
+        X_test, y_test = X[train_size + val_size :], y[train_size + val_size :]
 
         datasets_dict = {
             "X_train": X_train,
