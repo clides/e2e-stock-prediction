@@ -1,6 +1,10 @@
 from pathlib import Path
 
-from lstmPredictor.entity.entity import DataPreprocessingConfig, LSTMConfig
+from lstmPredictor.entity.entity import (
+    DataPreprocessingConfig,
+    LSTMConfig,
+    TrainingConfig,
+)
 from lstmPredictor.utils.common import read_yaml
 
 
@@ -36,4 +40,23 @@ class DataPreprocessingConfigurationManager:
             target=self.params.data_preprocessing.target,
             normalize=self.params.data_preprocessing.normalize,
             fill_method=self.params.data_preprocessing.fill_method,
+        )
+
+
+class TrainingConfigurationManager:
+    def __init__(self, params_path: Path):
+        self.params = read_yaml(params_path)
+
+    def get_training_config(self) -> TrainingConfig:
+        return TrainingConfig(
+            learning_rate=self.params.training.learning_rate,
+            weight_decay=self.params.training.weight_decay,
+            epochs=self.params.training.epochs,
+            optimizer=self.params.training.optimizer,
+            lr_patience=self.params.training.lr_patience,
+            lr_factor=self.params.training.lr_factor,
+            early_stopping_patience=self.params.training.early_stopping_patience,
+            gradient_clip=self.params.training.gradient_clip,
+            checkpoint_dir=self.params.training.checkpoint_dir,
+            checkpoint_freq=self.params.training.checkpoint_freq,
         )

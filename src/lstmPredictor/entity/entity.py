@@ -43,3 +43,17 @@ class DataPreprocessingConfig:
     target: str
     normalize: bool
     fill_method: str
+
+
+@dataclass
+class TrainingConfig:
+    learning_rate: int
+    weight_decay: int
+    epochs: int
+    optimizer: str
+    lr_patience: int
+    lr_factor: float
+    gradient_clip: float
+    early_stopping_patience: int
+    checkpoint_dir: str
+    checkpoint_freq: int
