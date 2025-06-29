@@ -7,7 +7,8 @@ from lstmPredictor.config.configuration import BaseModelConfigurationManager
 class BaseModelPipeline:
     def __init__(self):
         CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        self.config = BaseModelConfigurationManager(CONFIG_PATH)
+        config_manager = BaseModelConfigurationManager(CONFIG_PATH)
+        self.config = config_manager.get_base_model_config()
 
     def run(self):
         """
@@ -16,9 +17,7 @@ class BaseModelPipeline:
         Returns:
             LSTM model ready for training
         """
-
-        base_model_config = self.config.get_base_model_config()
-        preparer = PrepareBaseModel(base_model_config)
+        preparer = PrepareBaseModel(self.config)
         base_model, base_model_path = preparer.build_lstm()
 
         return base_model, base_model_path

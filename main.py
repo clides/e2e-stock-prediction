@@ -23,7 +23,7 @@ try:
     logger.info(f"Base model saved at: {base_model_path}")
     logger.info(">>>>>> (2) Initialize Base Model Stage completed <<<<<<")
 except Exception as e:
-    logger.exception(f"Error in (2) Initialize Base Model Stage started: {str(e)}")
+    logger.exception(f"Error in (2) Initialize Base Model Stage: {str(e)}")
     raise e
 
 # Stage 3: Preprocess Raw Data
@@ -33,7 +33,7 @@ try:
     dataloaders = data_preprocessing_pipeline.run()
     logger.info(">>>>>> (3) Preprocess Raw Data Stage completed <<<<<<")
 except Exception as e:
-    logger.exception(f"Error in (3) Preprocess Raw Data Stage started: {str(e)}")
+    logger.exception(f"Error in (3) Preprocess Raw Data Stage: {str(e)}")
     raise e
 
 # Stage 4: Train Model
@@ -46,7 +46,7 @@ try:
     )
     best_model_path = training_pipeline.run()
     logger.info(f"Best model saved at: {best_model_path}")
-    logger.info(">>>>>> (4) Train Model Stage completed <<<<<<")
+    logger.info(">>>>>> (4) Model Training Stage completed <<<<<<")
 except Exception as e:
-    logger.exception(f"Error in (4) Train Model Stage started: {str(e)}")
+    logger.exception(f"Error in (4) Model Training Stage: {str(e)}")
     raise e

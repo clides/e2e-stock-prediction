@@ -7,13 +7,13 @@ from lstmPredictor.config.configuration import DataPreprocessingConfigurationMan
 class DataPreprocessingPipeline:
     def __init__(self, raw_file_path: str):
         CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        self.config = DataPreprocessingConfigurationManager(CONFIG_PATH)
+        config_manager = DataPreprocessingConfigurationManager(CONFIG_PATH)
+        self.config = config_manager.get_data_preprocessing_config()
         self.raw_file_path = raw_file_path
 
     def run(self):
-        preprocessing_config = self.config.get_data_preprocessing_config()
         data_preprocessing_manager = DataPreprocessing(
-            config=preprocessing_config, raw_file_path=self.raw_file_path
+            config=self.config, raw_file_path=self.raw_file_path
         )
         dataloaders = data_preprocessing_manager.create_data_loaders()
 
