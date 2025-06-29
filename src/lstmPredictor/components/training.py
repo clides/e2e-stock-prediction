@@ -9,8 +9,8 @@ from torch.optim import Adam, Optimizer
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 
+from lstmPredictor import logger
 from lstmPredictor.config.configuration import TrainingConfig
-from lstmPredictor.utils.logger import logger
 
 
 class LSTMTrainer:
