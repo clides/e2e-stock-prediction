@@ -47,12 +47,11 @@ class DataPreprocessing:
         self, data: np.ndarray, target_idx: int
     ) -> Tuple[np.ndarray, np.ndarray]:
         X, y = [], []
-        feature_data = np.delete(data, target_idx, axis=1)
         target_data = data[:, target_idx]
         sequence_length = self.config.sequence_length
 
         for i in range(len(data) - sequence_length):
-            X.append(feature_data[i : i + sequence_length])
+            X.append(data[i : i + sequence_length])
             y.append(target_data[i + sequence_length])
 
         return np.array(X), np.array(y)
