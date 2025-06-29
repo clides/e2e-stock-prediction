@@ -30,6 +30,6 @@ training:
   lr_patience: 5
   lr_factor: 0.5
   gradient_clip: 1.0
-  early_stpping_patience: 10
+  early_stopping_patience: 10
   checkpoint_dir: "artifacts/model/checkpoints"
   checkpoint_freq: 20
