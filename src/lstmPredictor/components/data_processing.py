@@ -16,7 +16,7 @@ class StockDataset(Dataset):
 
     def __init__(self, features: np.ndarray, targets: np.ndarray):
         self.X = torch.FloatTensor(features)
-        self.y = torch.FloatTensor(targets)
+        self.y = torch.FloatTensor(targets).unsqueeze(-1)
 
     def __len__(self):
         return len(self.X)
