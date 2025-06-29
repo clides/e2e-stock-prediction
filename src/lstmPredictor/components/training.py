@@ -1,9 +1,6 @@
 from pathlib import Path
-from typing import Dict, Tuple
 
-import numpy as np
 import torch
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from torch import nn
 from torch.optim import Adam, Optimizer
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -89,7 +86,7 @@ class LSTMTrainer:
 
         return total_loss / len(self.train_loader)
 
-    def _validate_epoch(self, loader: DataLoader) -> Tuple[float, Dict[str, float]]:
+    def _validate_epoch(self, loader: DataLoader) -> float:
         self.model.eval()
         total_loss = 0.0
         all_preds = []
@@ -108,14 +105,8 @@ class LSTMTrainer:
 
         # Calculate additional metrics
         avg_loss = total_loss / len(loader)
-        metrics = {
-            "loss": avg_loss,
-            "mae": mean_absolute_error(all_targets, all_preds),
-            "rmse": np.sqrt(mean_squared_error(all_targets, all_preds)),
-            "r2": r2_score(all_targets, all_preds),
-        }
 
-        return avg_loss, metrics
+        return avg_loss
 
     def _check_early_stopping(self, val_loss: float) -> bool:
         """Check if training should stop early"""
@@ -150,7 +141,7 @@ class LSTMTrainer:
             train_loss = self._train_epoch()
 
             # Validation phase
-            val_loss, val_metrics = self._validate_epoch(self.val_loader)
+            val_loss = self._validate_epoch(self.val_loader)
             self.scheduler.step(val_loss)
 
             logger.info(
