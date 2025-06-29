@@ -27,7 +27,7 @@ class LSTMTrainer:
         self.val_loader = val_loader
 
         self.optimizer = self._create_optimizer()
-        self.loss_fn = nn.MSELoss()
+        self.loss_fn = nn.HuberLoss(delta=1.0)
         self.scheduler = ReduceLROnPlateau(
             self.optimizer,
             mode="min",
@@ -100,7 +100,7 @@ class LSTMTrainer:
                 X_batch, y_batch = X_batch.to(self.device), y_batch.to(self.device)
                 outputs = self.model(X_batch)
 
-                loss = self.criterion(outputs, y_batch)
+                loss = self.loss_fn(outputs, y_batch)
                 total_loss += loss.item()
 
                 all_preds.extend(outputs.cpu().numpy())
