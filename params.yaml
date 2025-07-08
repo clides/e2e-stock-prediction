@@ -33,3 +33,14 @@ training:
   early_stopping_patience: 10
   checkpoint_dir: "artifacts/model/checkpoints"
   checkpoint_freq: 20
+
+evaluation:
+  metrics:
+    - {"MeanAbsoluteError": True}
+    - {"RootMeanSquaredError": True}
+    - {"R^2": True}
+    - {"MeanAbsolutePercentageError": True}
+    - {"DirectionalAccuracy": True}
+    - {"PnL": True}
+    - {"SharpeRatio": True}
+    - {"MaxDrawdown": True}

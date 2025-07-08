@@ -30,7 +30,7 @@ except Exception as e:
 try:
     logger.info(">>>>>> (3) Preprocess Raw Data Stage started <<<<<<")
     data_preprocessing_pipeline = DataPreprocessingPipeline(data_path)
-    dataloaders = data_preprocessing_pipeline.run()
+    dataloaders, scaler = data_preprocessing_pipeline.run()
     logger.info(">>>>>> (3) Preprocess Raw Data Stage completed <<<<<<")
 except Exception as e:
     logger.exception(f"Error in (3) Preprocess Raw Data Stage: {str(e)}")

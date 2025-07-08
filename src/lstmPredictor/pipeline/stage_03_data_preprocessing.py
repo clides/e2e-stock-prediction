@@ -15,6 +15,6 @@ class DataPreprocessingPipeline:
         data_preprocessing_manager = DataPreprocessing(
             config=self.config, raw_file_path=self.raw_file_path
         )
-        dataloaders = data_preprocessing_manager.create_data_loaders()
+        dataloaders, scaler = data_preprocessing_manager.create_data_loaders()
 
-        return dataloaders
+        return dataloaders, scaler

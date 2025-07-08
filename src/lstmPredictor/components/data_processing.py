@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Dict, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -98,7 +98,7 @@ class DataPreprocessing:
         for name, arr in data_dict.items():
             np.save(Path(processed_file_path) / f"{name}.npy", arr)
 
-    def _preprocess(self) -> Dict[str, np.ndarray]:
+    def _preprocess(self) -> Tuple[Dict[str, np.ndarray], Optional[MinMaxScaler]]:
         # load and clean raw data into dataframe
         df = self._load_and_clean_data()
 
@@ -123,9 +123,9 @@ class DataPreprocessing:
             f"Data preprocessing completed and saved processed data to numpy files: {self.config.processed_file_path}"
         )
 
-        return split_data
+        return split_data, scaler if self.config.normalize else None
 
-    def create_data_loaders(self) -> Dict[str, DataLoader]:
+    def create_data_loaders(self) -> Tuple[Dict[str, DataLoader], MinMaxScaler]:
         """Returns dictionary of DataLoaders:
         {
             "X_train": DataLoader,
@@ -136,7 +136,7 @@ class DataPreprocessing:
             "y_val": DataLoader
         }
         """
-        preprocessed_data = self._preprocess()
+        preprocessed_data, scaler = self._preprocess()
         batch_size = self.config.batch_size
 
         datasets = {
@@ -163,4 +163,4 @@ class DataPreprocessing:
             "test": DataLoader(datasets["test"], batch_size=batch_size, shuffle=False),
         }
 
-        return loaders
+        return loaders, scaler
