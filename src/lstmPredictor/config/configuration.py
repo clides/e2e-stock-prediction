@@ -1,11 +1,25 @@
 from pathlib import Path
 
 from lstmPredictor.entity.entity import (
+    DataIngestionConfig,
     DataPreprocessingConfig,
+    EvaluationConfig,
     LSTMConfig,
     TrainingConfig,
 )
 from lstmPredictor.utils.common import read_yaml
+
+
+class DataIngestionConfigurationManager:
+    def __init__(self, params_path: Path):
+        self.params = read_yaml(params_path)
+
+    def get_data_ingestion_config(self) -> DataIngestionConfig:
+        return DataIngestionConfig(
+            ticker=self.params.data_ingestion.ticker,
+            num_days=self.params.data_ingestion.num_days,
+            raw_data_dir=self.params.data_ingestion.raw_data_dir,
+        )
 
 
 class BaseModelConfigurationManager:
@@ -60,3 +74,11 @@ class TrainingConfigurationManager:
             checkpoint_dir=self.params.training.checkpoint_dir,
             checkpoint_freq=self.params.training.checkpoint_freq,
         )
+
+
+class EvaluationConfigurationManager:
+    def __init__(self, params_path: Path):
+        self.params = read_yaml(params_path)
+
+    def get_evaluation_config(self) -> EvaluationConfig:
+        return EvaluationConfig(metrics=self.params.evaluation.metrics)

@@ -1,12 +1,11 @@
-import os
 from pathlib import Path
-from typing import Tuple
 
 import torch
 import torch.nn as nn
 
 from lstmPredictor import logger
 from lstmPredictor.entity.entity import LSTMConfig
+from lstmPredictor.utils.common import save_ptmodel
 
 
 class StockLSTM(nn.Module):
@@ -51,7 +50,7 @@ class PrepareBaseModel:
     def __init__(self, config: LSTMConfig):
         self.config = config
 
-    def build_lstm(self) -> Tuple[nn.Module, str]:
+    def build_lstm(self) -> Path:
         """Builds the LSTM architecture from config"""
         try:
             model = StockLSTM(
@@ -63,22 +62,11 @@ class PrepareBaseModel:
                 self.config.bidirectional,
             )
 
-            base_model_path = self._save_model(model, self.config.base_model_path)
+            base_model_path = save_ptmodel(
+                model, self.config.base_model_path, "base_model.pth"
+            )
 
-            return model, base_model_path
+            return base_model_path
         except Exception as e:
             logger.exception(f"Error building model: {e}")
-            raise e
-
-    def _save_model(self, model: StockLSTM, path: Path) -> str:
-        """Saves the entire model (architecture + weights)"""
-        try:
-            os.makedirs(path, exist_ok=True)
-
-            torch.save(model, path / "base_model.pth")
-            logger.info(f"Model saved to {path}")
-
-            return str(path / "base_model.pth")
-        except Exception as e:
-            logger.exception(f"Error saving model: {e}")
             raise e

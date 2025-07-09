@@ -1,5 +1,5 @@
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 import yfinance as yf
@@ -19,10 +19,12 @@ class StockDataIngestion:
     def _fetch_data(self) -> pd.DataFrame:
         """Download stock data from Yahoo Finance using validated config."""
         try:
+            end_date = datetime.now()
+            start_date = end_date - timedelta(days=self.config.num_days)
             data = yf.download(
                 self.config.ticker,
-                start=self.config.start_date,
-                end=datetime.now().strftime("%Y-%m-%d"),
+                start=start_date.strftime("%Y-%m-%d"),
+                end=end_date.strftime("%Y-%m-%d"),
             )
             if data.empty:
                 raise ValueError(

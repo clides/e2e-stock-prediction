@@ -18,6 +18,6 @@ class BaseModelPipeline:
             LSTM model ready for training
         """
         preparer = PrepareBaseModel(self.config)
-        base_model, base_model_path = preparer.build_lstm()
+        base_model_path = preparer.build_lstm()
 
-        return base_model, base_model_path
+        return base_model_path

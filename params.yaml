@@ -1,3 +1,8 @@
+data_ingestion:
+  ticker: "AAPL"
+  num_days: 365
+  raw_data_dir: "artifacts/data/raw_data"
+
 base_model:
   input_size: 5          # [Open, High, Low, Close, Volume]
   hidden_size: 64
@@ -35,12 +40,13 @@ training:
   checkpoint_freq: 20
 
 evaluation:
-  metrics:
-    - {"MeanAbsoluteError": True}
-    - {"RootMeanSquaredError": True}
-    - {"R^2": True}
-    - {"MeanAbsolutePercentageError": True}
-    - {"DirectionalAccuracy": True}
-    - {"PnL": True}
-    - {"SharpeRatio": True}
-    - {"MaxDrawdown": True}
+  metrics: {
+    "MeanAbsoluteError": True,
+    "RootMeanSquaredError": True,
+    "R^2": True,
+    "MeanAbsolutePercentageError": True,
+    "DirectionalAccuracy": True,
+    "PnL": True,
+    "SharpeRatio": True,
+    "MaxDrawdown": True
+  }

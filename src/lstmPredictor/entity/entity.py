@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from typing import Dict
 
 from lstmPredictor.utils.common import validate_date, validate_ticker
 
@@ -8,8 +9,8 @@ from lstmPredictor.utils.common import validate_date, validate_ticker
 @dataclass
 class DataIngestionConfig:
     ticker: str
-    start_date: str
-    raw_data_dir: str = "artifacts/data/raw_data"
+    num_days: int
+    raw_data_dir: str
 
     def __post_init__(self):
         self.ticker = validate_ticker(self.ticker)
@@ -57,3 +58,8 @@ class TrainingConfig:
     early_stopping_patience: int
     checkpoint_dir: str
     checkpoint_freq: int
+
+
+@dataclass
+class EvaluationConfig:
+    metrics: Dict[str, bool]

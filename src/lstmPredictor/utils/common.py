@@ -2,9 +2,10 @@ import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, Union
 
 import joblib
+import torch
 import yaml
 import yfinance as yf
 from box import ConfigBox
@@ -57,11 +58,12 @@ def load_bin(path: Path) -> Any:
 
 
 @ensure_annotations
-def get_size(path: Path) -> str:
+def get_size(path: Path) -> int:
     size_in_kb = round(os.path.getsize(path) / 1024)
     return size_in_kb
 
 
+@ensure_annotations
 def validate_ticker(ticker: str) -> str:
     """Returns the validated ticker if valid, otherwise raises ValueError."""
     ticker = str(ticker).strip().upper()
@@ -82,6 +84,7 @@ def validate_ticker(ticker: str) -> str:
         raise ValueError(f"Failed to validate ticker {ticker}: {str(e)}")
 
 
+@ensure_annotations
 def validate_date(start_date: str) -> str:
     """Validate date format and logic, returns validated start_date."""
     try:
@@ -101,3 +104,33 @@ def get_default_date_range(days_back: int = 365) -> tuple[str, str]:
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days_back)
     return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
+
+
+@ensure_annotations
+def save_ptmodel(
+    self, model: Union[torch.nn.Module, dict], path: Path, model_name: str
+) -> Path:
+    """Saves the entire model (architecture + weights)"""
+    try:
+        os.makedirs(path, exist_ok=True)
+        save_path = path / model_name
+
+        torch.save(model, save_path)
+        logger.info(f"Model saved to {save_path}")
+
+        return save_path
+    except Exception as e:
+        logger.exception(f"Error saving model: {e}")
+        raise e
+
+
+@ensure_annotations
+def load_ptmodel(path: Path) -> torch.nn.Module:
+    """Load a PyTorch model from a given path."""
+    try:
+        model = torch.load(path, map_location=torch.device("cpu"))
+        logger.info(f"Model loaded successfully from {path}")
+        return model
+    except Exception as e:
+        logger.error(f"Failed to load model from {path}: {e}")
+        raise e

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Optional
 
 import torch
 from torch import nn
@@ -8,6 +9,7 @@ from torch.utils.data import DataLoader
 
 from lstmPredictor import logger
 from lstmPredictor.config.configuration import TrainingConfig
+from lstmPredictor.utils.common import save_ptmodel
 
 
 class LSTMTrainer:
@@ -118,7 +120,9 @@ class LSTMTrainer:
             self.epochs_no_improve += 1
             return self.epochs_no_improve >= self.config.early_stopping_patience
 
-    def _save_checkpoint(self, epoch: int, is_best: bool = False):
+    def _save_checkpoint(
+        self, epoch: int, is_best: bool = False, model_name: Optional[str] = None
+    ) -> Path:
         """Save model to a checkpoint directory"""
         checkpoint = {
             "epoch": epoch,
@@ -128,12 +132,19 @@ class LSTMTrainer:
         }
 
         save_path = Path(self.config.checkpoint_dir)
-        save_path.mkdir(parents=True, exist_ok=True)
 
         if is_best:
-            torch.save(checkpoint, save_path / "best_model.pth")
+            name = model_name + "best_model.pth" if model_name else "best_model.pth"
+            save_ptmodel(checkpoint, save_path, name)
+            return save_path / name
         if epoch % self.config.checkpoint_freq == 0:
-            torch.save(checkpoint, save_path / f"checkpoint_epoch_{epoch}.pth")
+            name = (
+                model_name + f"checkpoint_epoch_{epoch}.pth"
+                if model_name
+                else f"checkpoint_epoch_{epoch}.pth"
+            )
+            save_ptmodel(checkpoint, save_path, name)
+            return save_path / name
 
     def train(self) -> Path:
         for epoch in range(1, self.config.epochs + 1):
@@ -152,14 +163,14 @@ class LSTMTrainer:
             )
 
             if val_loss < self.best_val_loss:
-                self._save_checkpoint(epoch, is_best=True)
+                best_model_path = self._save_checkpoint(epoch, is_best=True)
 
-            if epoch % self.config.checkpoint_freq == 0:
-                self._save_checkpoint(epoch)
+            if not best_model_path and epoch % self.config.checkpoint_freq == 0:
+                best_model_path = self._save_checkpoint(epoch)
 
             # Early stopping
             if self._check_early_stopping(val_loss):
                 logger.info(f"Early stopping at epoch {epoch}")
                 break
 
-        return Path(self.config.checkpoint_dir) / "best_model.pth"
+        return best_model_path

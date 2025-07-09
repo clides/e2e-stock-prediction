@@ -3,6 +3,7 @@ from lstmPredictor.pipeline.stage_01_data_injestion import DataIngestionTraining
 from lstmPredictor.pipeline.stage_02_base_model import BaseModelPipeline
 from lstmPredictor.pipeline.stage_03_data_preprocessing import DataPreprocessingPipeline
 from lstmPredictor.pipeline.stage_04_training import TrainingPipeline
+from lstmPredictor.utils.common import load_ptmodel
 
 # Stage 1: Data Ingestion
 try:
@@ -19,7 +20,7 @@ except Exception as e:
 try:
     logger.info(">>>>>> (2) Initialize Base Model Stage started <<<<<<")
     base_model_pipeline = BaseModelPipeline()
-    base_model, base_model_path = base_model_pipeline.run()
+    base_model_path = base_model_pipeline.run()
     logger.info(f"Base model saved at: {base_model_path}")
     logger.info(">>>>>> (2) Initialize Base Model Stage completed <<<<<<")
 except Exception as e:
@@ -39,6 +40,7 @@ except Exception as e:
 # Stage 4: Train Model
 try:
     logger.info(">>>>>> (4) Model Training Stage started <<<<<<")
+    base_model = load_ptmodel(base_model_path)
     training_pipeline = TrainingPipeline(
         model=base_model,
         train_loader=dataloaders["train"],
