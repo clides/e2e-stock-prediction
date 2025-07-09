@@ -4,10 +4,8 @@ from lstmPredictor.components.data_ingestion import StockDataIngestion
 from lstmPredictor.config.configuration import DataIngestionConfigurationManager
 
 
-class DataIngestionTrainingPipeline:
-    def __init__(
-        self,
-    ):
+class DataIngestionPipeline:
+    def __init__(self):
         CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
         config_manager = DataIngestionConfigurationManager(CONFIG_PATH)
         self.config = config_manager.get_data_ingestion_config()

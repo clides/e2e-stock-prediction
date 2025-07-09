@@ -1,5 +1,5 @@
 from lstmPredictor import logger
-from lstmPredictor.pipeline.stage_01_data_injestion import DataIngestionTrainingPipeline
+from lstmPredictor.pipeline.stage_01_data_injestion import DataIngestionPipeline
 from lstmPredictor.pipeline.stage_02_base_model import BaseModelPipeline
 from lstmPredictor.pipeline.stage_03_data_preprocessing import DataPreprocessingPipeline
 from lstmPredictor.pipeline.stage_04_training import TrainingPipeline
@@ -8,7 +8,7 @@ from lstmPredictor.utils.common import load_ptmodel
 # Stage 1: Data Ingestion
 try:
     logger.info(">>>>>> (1) Data Ingestion Stage started <<<<<<")
-    data_ingestion = DataIngestionTrainingPipeline()
+    data_ingestion = DataIngestionPipeline()
     data_path = data_ingestion.run()
     logger.info(f"Data saved at: {data_path}")
     logger.info(">>>>>> (1) Data Ingestion Stage completed <<<<<<")

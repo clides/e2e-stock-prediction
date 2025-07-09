@@ -64,7 +64,7 @@ def get_size(path: Path) -> int:
 
 
 @ensure_annotations
-def validate_ticker(ticker: str) -> str:
+def validate_ticker(ticker: str):
     """Returns the validated ticker if valid, otherwise raises ValueError."""
     ticker = str(ticker).strip().upper()
 
@@ -79,13 +79,12 @@ def validate_ticker(ticker: str) -> str:
             raise ValueError(
                 f"No data found for ticker: {ticker}. Please check the ticker symbol."
             )
-        return ticker
     except Exception as e:
         raise ValueError(f"Failed to validate ticker {ticker}: {str(e)}")
 
 
 @ensure_annotations
-def validate_date(start_date: str) -> str:
+def validate_date(start_date: str):
     """Validate date format and logic, returns validated start_date."""
     try:
         start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -93,7 +92,6 @@ def validate_date(start_date: str) -> str:
 
         if start >= current_date - timedelta(days=365):
             raise ValueError("start_date must be before end_date")
-        return start_date
     except ValueError as e:
         raise ValueError(f"Invalid date format or logic: {e}. Use YYYY-MM-DD.")
 
@@ -108,7 +106,7 @@ def get_default_date_range(days_back: int = 365) -> tuple[str, str]:
 
 @ensure_annotations
 def save_ptmodel(
-    self, model: Union[torch.nn.Module, dict], path: Path, model_name: str
+    model: Union[torch.nn.Module, dict], path: Path, model_name: str
 ) -> Path:
     """Saves the entire model (architecture + weights)"""
     try:
@@ -128,7 +126,7 @@ def save_ptmodel(
 def load_ptmodel(path: Path) -> torch.nn.Module:
     """Load a PyTorch model from a given path."""
     try:
-        model = torch.load(path, map_location=torch.device("cpu"))
+        model = torch.load(path, map_location=torch.device("cpu"), weights_only=False)
         logger.info(f"Model loaded successfully from {path}")
         return model
     except Exception as e:

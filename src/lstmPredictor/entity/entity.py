@@ -1,9 +1,6 @@
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Dict
-
-from lstmPredictor.utils.common import validate_date, validate_ticker
 
 
 @dataclass
@@ -11,14 +8,6 @@ class DataIngestionConfig:
     ticker: str
     num_days: int
     raw_data_dir: str
-
-    def __post_init__(self):
-        self.ticker = validate_ticker(self.ticker)
-        self.start_date = validate_date(self.start_date)
-
-    @property
-    def csv_path(self):
-        return f"{self.raw_data_dir}/{self.ticker}/{self.start_date}_to_{datetime.now().strftime('%Y-%m-%d')}.csv"
 
 
 @dataclass

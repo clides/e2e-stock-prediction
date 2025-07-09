@@ -5,6 +5,7 @@ import pandas as pd
 import yfinance as yf
 
 from lstmPredictor.entity.entity import DataIngestionConfig
+from lstmPredictor.utils.common import validate_date, validate_ticker
 
 
 class StockDataIngestion:
@@ -13,18 +14,23 @@ class StockDataIngestion:
         Initialize with a validated DataIngestionConfig object.
         """
         self.config = config
-        # Create directory if it doesn't exist
-        os.makedirs(os.path.dirname(self.config.csv_path), exist_ok=True)
+        self.raw_data_dir = config.raw_data_dir
+        self.ticker = config.ticker
+        self.start_date = datetime.now() - timedelta(days=config.num_days)
+
+        validate_date(self.start_date.strftime("%Y-%m-%d"))
+        validate_ticker(self.ticker)
+
+    def _csv_path(self, raw_data_dir: str, ticker: str, start_date: str) -> str:
+        return f"{self.raw_data_dir}/{self.ticker}/{self.start_date}_to_{datetime.now().strftime('%Y-%m-%d')}.csv"
 
     def _fetch_data(self) -> pd.DataFrame:
         """Download stock data from Yahoo Finance using validated config."""
         try:
-            end_date = datetime.now()
-            start_date = end_date - timedelta(days=self.config.num_days)
             data = yf.download(
-                self.config.ticker,
-                start=start_date.strftime("%Y-%m-%d"),
-                end=end_date.strftime("%Y-%m-%d"),
+                tickers=self.ticker,
+                start=self.start_date.strftime("%Y-%m-%d"),
+                end=datetime.now().strftime("%Y-%m-%d"),
             )
             if data.empty:
                 raise ValueError(
@@ -34,7 +40,7 @@ class StockDataIngestion:
         except Exception as e:
             raise RuntimeError(f"Failed to fetch data: {str(e)}")
 
-    def _save_data(self, data: pd.DataFrame) -> None:
+    def _save_data(self, data: pd.DataFrame) -> str:
         """Store the raw stock data with only Date, Open, High, Low, Close, Volume columns."""
         try:
             data.columns = data.columns.droplevel("Ticker")
@@ -43,9 +49,16 @@ class StockDataIngestion:
             cols = ["Open", "High", "Low", "Close", "Volume"]
             data = data[cols]
 
-            data.to_csv(self.config.csv_path)
+            csv_path = self._csv_path(
+                raw_data_dir=self.raw_data_dir,
+                ticker=self.ticker,
+                start_date=self.start_date.strftime("%Y-%m-%d"),
+            )
+            os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+            data.to_csv(csv_path)
 
-            print(f"Successfully saved {len(data)} records to {self.config.csv_path}")
+            print(f"Successfully saved {len(data)} records to {csv_path}")
+            return csv_path
         except Exception as e:
             raise RuntimeError(f"Failed to save data: {str(e)}")
 
@@ -55,5 +68,4 @@ class StockDataIngestion:
         Returns the path where data was saved.
         """
         data = self._fetch_data()
-        self._save_data(data)
-        return self.config.csv_path
+        return self._save_data(data)
