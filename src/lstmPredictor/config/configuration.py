@@ -34,7 +34,7 @@ class BaseModelConfigurationManager:
             output_size=1,
             dropout=self.params.base_model.dropout,
             bidirectional=self.params.base_model.bidirectional,
-            base_model_path=Path("artifacts/models"),
+            base_model_path=self.params.base_model.base_model_path,
         )
 
 

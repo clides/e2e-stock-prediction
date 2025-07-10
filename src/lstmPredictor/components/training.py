@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -8,7 +9,10 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 from torch.utils.data import DataLoader
 
 from lstmPredictor import logger
-from lstmPredictor.config.configuration import TrainingConfig
+from lstmPredictor.config.configuration import (
+    DataIngestionConfigurationManager,
+    TrainingConfig,
+)
 from lstmPredictor.utils.common import save_ptmodel
 
 
@@ -38,6 +42,10 @@ class LSTMTrainer:
 
         self.best_val_loss = float("inf")
         self.epochs_no_improve = 0
+
+        self.data_config = DataIngestionConfigurationManager(
+            Path(__file__).parent.parent.parent.parent / "params.yaml"
+        ).get_data_ingestion_config()
 
     def _get_device(self) -> torch.device:
         """Determine the best available device"""
@@ -131,10 +139,9 @@ class LSTMTrainer:
             "val_loss": self.best_val_loss,
         }
 
-        save_path = Path(self.config.checkpoint_dir)
-
+        save_path = Path(self.config.checkpoint_dir) / self.data_config.ticker
         if is_best:
-            name = model_name + "best_model.pth" if model_name else "best_model.pth"
+            name = model_name + "_best_model.pth" if model_name else "best_model.pth"
             save_ptmodel(checkpoint, save_path, name)
             return save_path / name
         if epoch % self.config.checkpoint_freq == 0:
@@ -162,11 +169,15 @@ class LSTMTrainer:
                 f"LR: {self.optimizer.param_groups[0]['lr']:.2e}"
             )
 
+            model_name = (
+                datetime.now() - timedelta(days=self.data_config.num_days)
+            ).strftime("%Y-%m-%d")
             if val_loss < self.best_val_loss:
-                best_model_path = self._save_checkpoint(epoch, is_best=True)
-
+                best_model_path = self._save_checkpoint(
+                    epoch, is_best=True, model_name=model_name
+                )
             if not best_model_path and epoch % self.config.checkpoint_freq == 0:
-                best_model_path = self._save_checkpoint(epoch)
+                best_model_path = self._save_checkpoint(epoch, model_name=model_name)
 
             # Early stopping
             if self._check_early_stopping(val_loss):

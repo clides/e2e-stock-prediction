@@ -64,7 +64,7 @@ class PrepareBaseModel:
 
             base_model_path = save_ptmodel(
                 model=model,
-                path=self.config.base_model_path,
+                path=Path(self.config.base_model_path),
                 model_name="base_model.pth",
             )
 

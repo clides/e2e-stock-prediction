@@ -14,6 +14,7 @@ base_model:
   epochs: 100
   sequence_length: 30    # Lookback window (days)
   weight_decay: 1e-4     # L2 regularization
+  base_model_path: "artifacts/model"
 
 data_preprocessing:
   processed_file_path: "artifacts/data/processed_data"
@@ -36,7 +37,7 @@ training:
   lr_factor: 0.5
   gradient_clip: 1.0
   early_stopping_patience: 10
-  checkpoint_dir: "artifacts/model/checkpoints"
+  checkpoint_dir: "artifacts/model"
   checkpoint_freq: 20
 
 evaluation:

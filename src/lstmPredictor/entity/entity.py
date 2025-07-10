@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Dict
 
 
@@ -18,7 +17,7 @@ class LSTMConfig:
     num_layers: int
     dropout: float
     bidirectional: bool
-    base_model_path: Path
+    base_model_path: str
 
 
 @dataclass
