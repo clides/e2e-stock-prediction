@@ -1,13 +1,11 @@
-from pathlib import Path
-
 from lstmPredictor.components.data_processing import DataPreprocessing
 from lstmPredictor.config.configuration import DataPreprocessingConfigurationManager
+from lstmPredictor.constants import PARAMS_FILE_PATH
 
 
 class DataPreprocessingPipeline:
     def __init__(self, raw_file_path: str):
-        CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        config_manager = DataPreprocessingConfigurationManager(CONFIG_PATH)
+        config_manager = DataPreprocessingConfigurationManager(PARAMS_FILE_PATH)
         self.config = config_manager.get_data_preprocessing_config()
         self.raw_file_path = raw_file_path
 

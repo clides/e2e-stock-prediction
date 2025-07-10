@@ -1,13 +1,11 @@
-from pathlib import Path
-
 from lstmPredictor.components.data_ingestion import StockDataIngestion
 from lstmPredictor.config.configuration import DataIngestionConfigurationManager
+from lstmPredictor.constants import PARAMS_FILE_PATH
 
 
 class DataIngestionPipeline:
     def __init__(self):
-        CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        config_manager = DataIngestionConfigurationManager(CONFIG_PATH)
+        config_manager = DataIngestionConfigurationManager(PARAMS_FILE_PATH)
         self.config = config_manager.get_data_ingestion_config()
 
     def run(self) -> str:

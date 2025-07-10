@@ -5,6 +5,7 @@ from torch.utils.data import DataLoader
 
 from lstmPredictor.components.training import LSTMTrainer
 from lstmPredictor.config.configuration import TrainingConfigurationManager
+from lstmPredictor.constants import PARAMS_FILE_PATH
 
 
 class TrainingPipeline:
@@ -14,8 +15,7 @@ class TrainingPipeline:
         train_loader: DataLoader,
         val_loader: DataLoader,
     ):
-        CONFIG_PATH = Path(__file__).parent.parent.parent.parent / "params.yaml"
-        config_manager = TrainingConfigurationManager(CONFIG_PATH)
+        config_manager = TrainingConfigurationManager(PARAMS_FILE_PATH)
         self.config = config_manager.get_training_config()
         self.model = model
         self.train_loader = train_loader
@@ -28,6 +28,4 @@ class TrainingPipeline:
             train_loader=self.train_loader,
             val_loader=self.val_loader,
         )
-        best_model_path = trainer.train()
-
-        return best_model_path
+        return trainer.train()

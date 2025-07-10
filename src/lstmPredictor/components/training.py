@@ -169,9 +169,7 @@ class LSTMTrainer:
                 f"LR: {self.optimizer.param_groups[0]['lr']:.2e}"
             )
 
-            model_name = (
-                datetime.now() - timedelta(days=self.data_config.num_days)
-            ).strftime("%Y-%m-%d")
+            model_name = f'{(datetime.now() - timedelta(days=self.data_config.num_days)).strftime("%Y-%m-%d")}-to-{datetime.now().strftime("%Y-%m-%d")}'
             if val_loss < self.best_val_loss:
                 best_model_path = self._save_checkpoint(
                     epoch, is_best=True, model_name=model_name
