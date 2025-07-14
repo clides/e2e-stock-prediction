@@ -13,7 +13,7 @@ from lstmPredictor.config.configuration import (
     DataIngestionConfigurationManager,
     TrainingConfig,
 )
-from lstmPredictor.utils.common import save_ptmodel
+from lstmPredictor.utils.common import get_device, save_ptmodel
 
 
 class LSTMTrainer:
@@ -38,7 +38,7 @@ class LSTMTrainer:
             factor=config.lr_factor,
         )
 
-        self.device = self._get_device()
+        self.device = get_device()
 
         self.best_val_loss = float("inf")
         self.epochs_no_improve = 0
@@ -46,10 +46,6 @@ class LSTMTrainer:
         self.data_config = DataIngestionConfigurationManager(
             Path(__file__).parent.parent.parent.parent / "params.yaml"
         ).get_data_ingestion_config()
-
-    def _get_device(self) -> torch.device:
-        """Determine the best available device"""
-        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     def _create_optimizer(self) -> Optimizer:
         """Creates optimizer based on the training config"""

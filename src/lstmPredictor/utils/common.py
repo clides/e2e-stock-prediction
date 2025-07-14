@@ -5,12 +5,14 @@ from pathlib import Path
 from typing import Any, Union
 
 import joblib
+import numpy as np
 import torch
 import yaml
 import yfinance as yf
 from box import ConfigBox
 from box.exceptions import BoxValueError
 from ensure import ensure_annotations
+from sklearn.preprocessing import MinMaxScaler
 
 from lstmPredictor import logger
 
@@ -104,6 +106,11 @@ def get_default_date_range(days_back: int = 365) -> tuple[str, str]:
     return start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d")
 
 
+def get_device() -> torch.device:
+    """Determine the best available device"""
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+
 @ensure_annotations
 def save_ptmodel(
     model: Union[torch.nn.Module, dict], path: Path, model_name: str
@@ -132,3 +139,24 @@ def load_ptmodel(path: Path) -> torch.nn.Module:
     except Exception as e:
         logger.error(f"Failed to load model from {path}: {e}")
         raise e
+
+    @ensure_annotations
+    def inverse_transform_predictions(
+        y_pred: np.ndarray, scaler: MinMaxScaler
+    ) -> np.ndarray:
+        from lstmPredictor.config.configuration import (
+            DataPreprocessingConfigurateionManager,
+        )
+
+        data_config = DataPreprocessingConfigurateionManager(
+            Path(__file__).parent.parent.parent.parent / "params.yaml"
+        ).get_data_preprocessing_config()
+        target_col_idx = data_config.features.index(data_config.target)
+
+        y_pred = y_pred.reshape(-1, 1)
+        dummy_y_pred = np.zeros((y_pred.shape[0], scaler.n_features_in_))
+
+        dummy_y_pred[:, target_col_idx] = y_pred.squeeze()
+
+        inversed_y_pred = scaler.inverse_transform(dummy_y_pred)
+        return inversed_y_pred[:, target_col_idx]

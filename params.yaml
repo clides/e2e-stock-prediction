@@ -47,7 +47,6 @@ evaluation:
     "R^2": True,
     "MeanAbsolutePercentageError": True,
     "DirectionalAccuracy": True,
-    "PnL": True,
+    "MagCorr": True,
     "SharpeRatio": True,
-    "MaxDrawdown": True
   }
