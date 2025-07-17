@@ -4,7 +4,7 @@ data_ingestion:
   raw_data_dir: "artifacts/data/raw_data"
 
 base_model:
-  input_size: 1          # [Open, High, Low, Close, Volume]
+  input_size: 5          # [Open, High, Low, Close, Volume]
   hidden_size: 128
   num_layers: 2
   dropout: 0.2
@@ -19,8 +19,7 @@ data_preprocessing:
   test_size: 0.1
   val_size: 0.1
   batch_size: 32
-  # features: ["Open", "High", "Low", "Close", "Volume"]
-  features: ["Close"]
+  features: ["Open", "High", "Low", "Close", "Volume"]
   target: "Close"
   normalize: True
   fill_method: "ffill"
