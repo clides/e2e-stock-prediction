@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader, Dataset
 
 from lstmPredictor import logger
 from lstmPredictor.entity.entity import DataPreprocessingConfig
+from lstmPredictor.utils.common import set_random_seed
 
 
 class StockDataset(Dataset):
@@ -164,6 +165,7 @@ class DataPreprocessing:
             "y_val": DataLoader
         }
         """
+        set_random_seed(self.config.seed)
         preprocessed_data, scaler = self._preprocess()
         batch_size = self.config.batch_size
 

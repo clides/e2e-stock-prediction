@@ -35,6 +35,7 @@ class BaseModelConfigurationManager:
             dropout=self.params.base_model.dropout,
             bidirectional=self.params.base_model.bidirectional,
             base_model_path=self.params.base_model.base_model_path,
+            seed=self.params.base_model.seed,
         )
 
 
@@ -54,6 +55,7 @@ class DataPreprocessingConfigurationManager:
             target=self.params.data_preprocessing.target,
             normalize=self.params.data_preprocessing.normalize,
             fill_method=self.params.data_preprocessing.fill_method,
+            seed=self.params.data_preprocessing.seed,
         )
 
 
@@ -73,6 +75,7 @@ class TrainingConfigurationManager:
             gradient_clip=self.params.training.gradient_clip,
             checkpoint_dir=self.params.training.checkpoint_dir,
             checkpoint_freq=self.params.training.checkpoint_freq,
+            seed=self.params.training.seed,
         )
 
 

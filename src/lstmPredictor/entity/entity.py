@@ -18,6 +18,7 @@ class LSTMConfig:
     dropout: float
     bidirectional: bool
     base_model_path: str
+    seed: int
 
 
 @dataclass
@@ -32,6 +33,7 @@ class DataPreprocessingConfig:
     target: str
     normalize: bool
     fill_method: str
+    seed: int
 
 
 @dataclass
@@ -46,6 +48,7 @@ class TrainingConfig:
     early_stopping_patience: int
     checkpoint_dir: str
     checkpoint_freq: int
+    seed: int
 
 
 @dataclass

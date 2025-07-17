@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Union
@@ -159,3 +160,16 @@ def inverse_transform_predictions(
 
     inversed_y_pred = scaler.inverse_transform(dummy_y_pred)
     return inversed_y_pred[:, target_col_idx]
+
+
+def set_random_seed(seed: int = 42):
+    """Sets the random seed for reproducibility."""
+    os.environ["PYTHONHASHSEED"] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    logger.info(f"Random seed set to {seed}, CUDNN deterministic enabled")

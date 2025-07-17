@@ -13,7 +13,7 @@ from lstmPredictor.config.configuration import (
     DataIngestionConfigurationManager,
     TrainingConfig,
 )
-from lstmPredictor.utils.common import get_device, save_ptmodel
+from lstmPredictor.utils.common import get_device, save_ptmodel, set_random_seed
 
 
 class LSTMTrainer:
@@ -30,7 +30,8 @@ class LSTMTrainer:
         self.val_loader = val_loader
 
         self.optimizer = self._create_optimizer()
-        self.loss_fn = nn.HuberLoss(delta=1.0)
+        # self.loss_fn = nn.HuberLoss(delta=1.0)
+        self.loss_fn = nn.MSELoss()
         self.scheduler = ReduceLROnPlateau(
             self.optimizer,
             mode="min",
@@ -146,6 +147,8 @@ class LSTMTrainer:
             return save_path / name
 
     def train(self) -> Path:
+        set_random_seed(self.config.seed)
+
         for epoch in range(1, self.config.epochs + 1):
             # Training phase
             train_loss = self._train_epoch()
