@@ -30,8 +30,7 @@ class LSTMTrainer:
         self.val_loader = val_loader
 
         self.optimizer = self._create_optimizer()
-        # self.loss_fn = nn.HuberLoss(delta=1.0)
-        self.loss_fn = nn.MSELoss()
+        self.loss_fn = nn.HuberLoss(delta=1.0)
         self.scheduler = ReduceLROnPlateau(
             self.optimizer,
             mode="min",
