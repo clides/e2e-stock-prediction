@@ -1,42 +1,39 @@
 data_ingestion:
-  ticker: "AAPL"
-  num_days: 365
+  ticker: "IBM"
+  num_days: 5000
   raw_data_dir: "artifacts/data/raw_data"
 
 base_model:
-  input_size: 5          # [Open, High, Low, Close, Volume]
-  hidden_size: 64
+  input_size: 1          # [Open, High, Low, Close, Volume]
+  hidden_size: 128
   num_layers: 2
   dropout: 0.2
   bidirectional: False   # For potential future enhancement
-  learning_rate: 0.001
   batch_size: 32
-  epochs: 100
-  sequence_length: 30    # Lookback window (days)
-  weight_decay: 1e-4     # L2 regularization
   base_model_path: "artifacts/model"
 
 data_preprocessing:
   processed_file_path: "artifacts/data/processed_data"
-  sequence_length: 30
+  sequence_length: 60
   train_size: 0.8
   test_size: 0.1
   val_size: 0.1
   batch_size: 32
-  features: ["Open", "High", "Low", "Close", "Volume"]
+  # features: ["Open", "High", "Low", "Close", "Volume"]
+  features: ["Close"]
   target: "Close"
   normalize: True
   fill_method: "ffill"
 
 training:
-  learning_rate: 0.001
-  weight_decay: 1e-4
+  learning_rate: 0.0005
+  weight_decay: 5e-4
   epochs: 100
-  optimizer: "adam"
-  lr_patience: 5
-  lr_factor: 0.5
-  gradient_clip: 1.0
-  early_stopping_patience: 10
+  optimizer: "adamw"
+  lr_patience: 7
+  lr_factor: 0.3
+  gradient_clip: 1.5
+  early_stopping_patience: 25
   checkpoint_dir: "artifacts/model"
   checkpoint_freq: 20
 
@@ -50,3 +47,5 @@ evaluation:
     "MagCorr": True,
     "SharpeRatio": True,
   }
+  log_scores: True
+  save_graph: True

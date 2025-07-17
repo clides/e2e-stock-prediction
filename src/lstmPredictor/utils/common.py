@@ -140,23 +140,22 @@ def load_ptmodel(path: Path) -> torch.nn.Module:
         logger.error(f"Failed to load model from {path}: {e}")
         raise e
 
-    @ensure_annotations
-    def inverse_transform_predictions(
-        y_pred: np.ndarray, scaler: MinMaxScaler
-    ) -> np.ndarray:
-        from lstmPredictor.config.configuration import (
-            DataPreprocessingConfigurateionManager,
-        )
 
-        data_config = DataPreprocessingConfigurateionManager(
-            Path(__file__).parent.parent.parent.parent / "params.yaml"
-        ).get_data_preprocessing_config()
-        target_col_idx = data_config.features.index(data_config.target)
+@ensure_annotations
+def inverse_transform_predictions(
+    y_pred: np.ndarray, scaler: MinMaxScaler
+) -> np.ndarray:
+    from lstmPredictor.config.configuration import DataPreprocessingConfigurationManager
 
-        y_pred = y_pred.reshape(-1, 1)
-        dummy_y_pred = np.zeros((y_pred.shape[0], scaler.n_features_in_))
+    data_config = DataPreprocessingConfigurationManager(
+        Path(__file__).parent.parent.parent.parent / "params.yaml"
+    ).get_data_preprocessing_config()
+    target_col_idx = data_config.features.index(data_config.target)
 
-        dummy_y_pred[:, target_col_idx] = y_pred.squeeze()
+    y_pred = y_pred.reshape(-1, 1)
+    dummy_y_pred = np.zeros((y_pred.shape[0], scaler.n_features_in_))
 
-        inversed_y_pred = scaler.inverse_transform(dummy_y_pred)
-        return inversed_y_pred[:, target_col_idx]
+    dummy_y_pred[:, target_col_idx] = y_pred.squeeze()
+
+    inversed_y_pred = scaler.inverse_transform(dummy_y_pred)
+    return inversed_y_pred[:, target_col_idx]

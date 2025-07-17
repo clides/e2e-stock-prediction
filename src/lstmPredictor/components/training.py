@@ -51,6 +51,7 @@ class LSTMTrainer:
         """Creates optimizer based on the training config"""
         optimizer_map = {
             "adam": Adam,
+            "adamw": torch.optim.AdamW,
             "sgd": torch.optim.SGD,
             "rmsprop": torch.optim.RMSprop,
         }
@@ -128,12 +129,7 @@ class LSTMTrainer:
         self, epoch: int, is_best: bool = False, model_name: Optional[str] = None
     ) -> Path:
         """Save model to a checkpoint directory"""
-        checkpoint = {
-            "epoch": epoch,
-            "model_state_dict": self.model.state_dict(),
-            "optimizer_state_dict": self.optimizer.state_dict(),
-            "val_loss": self.best_val_loss,
-        }
+        checkpoint = self.model
 
         save_path = Path(self.config.checkpoint_dir) / self.data_config.ticker
         if is_best:
@@ -166,16 +162,34 @@ class LSTMTrainer:
             )
 
             model_name = f'{(datetime.now() - timedelta(days=self.data_config.num_days)).strftime("%Y-%m-%d")}-to-{datetime.now().strftime("%Y-%m-%d")}'
-            if val_loss < self.best_val_loss:
+
+            # Early stopping check comes first
+            if self._check_early_stopping(val_loss):
+                logger.info(
+                    f"Early stopping triggered at epoch {epoch}. Best validation loss: {self.best_val_loss:.6f}"
+                )
+                # Save the best model before breaking
                 best_model_path = self._save_checkpoint(
                     epoch, is_best=True, model_name=model_name
                 )
-            if not best_model_path and epoch % self.config.checkpoint_freq == 0:
-                best_model_path = self._save_checkpoint(epoch, model_name=model_name)
-
-            # Early stopping
-            if self._check_early_stopping(val_loss):
-                logger.info(f"Early stopping at epoch {epoch}")
                 break
+
+            # Standard checkpointing for the best model so far
+            if val_loss == self.best_val_loss:
+                best_model_path = self._save_checkpoint(
+                    epoch, is_best=True, model_name=model_name
+                )
+            elif epoch % self.config.checkpoint_freq == 0:
+                # Save a periodic checkpoint if it's not the best model epoch
+                self._save_checkpoint(epoch, is_best=False, model_name=model_name)
+
+        # Ensure best_model_path is returned, especially if training completes without early stopping
+        if "best_model_path" not in locals():
+            logger.warning(
+                "Training finished, but no best model was saved. Saving the final model."
+            )
+            best_model_path = self._save_checkpoint(
+                self.config.epochs, is_best=True, model_name=model_name
+            )
 
         return best_model_path

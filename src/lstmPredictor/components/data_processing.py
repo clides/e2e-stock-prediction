@@ -99,31 +99,59 @@ class DataPreprocessing:
             np.save(Path(processed_file_path) / f"{name}.npy", arr)
 
     def _preprocess(self) -> Tuple[Dict[str, np.ndarray], Optional[MinMaxScaler]]:
-        # load and clean raw data into dataframe
+        # Load and clean raw data into a DataFrame
         df = self._load_and_clean_data()
 
-        # feature selection
+        # Feature selection
         features = self.config.features
-        data = df[features].values
+        df_features = df[features]
 
-        # normalization
+        # Time-series split on the DataFrame first
+        total_size = len(df_features)
+        test_size = int(total_size * self.config.test_size)
+        val_size = int(total_size * self.config.val_size)
+        train_size = total_size - test_size - val_size
+
+        df_train = df_features.iloc[:train_size]
+        df_val = df_features.iloc[train_size : train_size + val_size]
+        df_test = df_features.iloc[train_size + val_size :]
+
+        # Normalization (fitting only on training data)
+        scaler = None
         if self.config.normalize:
             scaler = MinMaxScaler()
-            data = scaler.fit_transform(data)
+            # Fit on training data and transform all sets
+            scaled_train_data = scaler.fit_transform(df_train)
+            scaled_val_data = scaler.transform(df_val)
+            scaled_test_data = scaler.transform(df_test)
+        else:
+            scaled_train_data = df_train.values
+            scaled_val_data = df_val.values
+            scaled_test_data = df_test.values
 
-        # create sequences
-        X, y = self._create_sequences(
-            data=data, target_idx=df.columns.get_loc(self.config.target)
-        )
+        target_idx = df_features.columns.get_loc(self.config.target)
 
-        # split and save data into training, testing, validation datasets
-        split_data = self._time_series_split(X, y)
+        # Create sequences from each scaled dataset
+        X_train, y_train = self._create_sequences(scaled_train_data, target_idx)
+        X_val, y_val = self._create_sequences(scaled_val_data, target_idx)
+        X_test, y_test = self._create_sequences(scaled_test_data, target_idx)
+
+        # Combine into a single dictionary
+        split_data = {
+            "X_train": X_train,
+            "y_train": y_train,
+            "X_val": X_val,
+            "y_val": y_val,
+            "X_test": X_test,
+            "y_test": y_test,
+        }
+
         self._save_artifacts(split_data)
         logger.info(
-            f"Data preprocessing completed and saved processed data to numpy files: {self.config.processed_file_path}"
+            f"Data preprocessing completed and artifacts saved to {self.config.processed_file_path}"
         )
 
-        return split_data, scaler if self.config.normalize else None
+        return split_data, scaler
 
     def create_data_loaders(self) -> Tuple[Dict[str, DataLoader], MinMaxScaler]:
         """Returns dictionary of DataLoaders:

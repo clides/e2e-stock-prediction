@@ -1,13 +1,15 @@
-from typing import Tuple
+import os
+from typing import Dict, Tuple
 
+import matplotlib.pyplot as plt
 import numpy as np
 import torch
-from lst.mPredictor.utils.common import get_device, inverse_transform_predictions
 from sklearn.preprocessing import MinMaxScaler
 from torch import nn
 from torch.utils.data import DataLoader
 
 from lstmPredictor.config.configuration import EvaluationConfig
+from lstmPredictor.utils.common import get_device, inverse_transform_predictions
 
 
 class EvaluateModel:
@@ -61,8 +63,8 @@ class EvaluateModel:
         self, y_true: np.ndarray, y_pred: np.ndarray
     ) -> Tuple[np.ndarray, np.ndarray]:
         """Calculate returns based on predictions from the model"""
-        pred_returns = (y_pred[1:] - y_true[:-1]) / y_true[:-1]
-        actual_returns = np.diff(y_true) / y_true[:-1]
+        pred_returns = np.diff(y_pred) / (y_pred[:-1] + 1e-10)
+        actual_returns = np.diff(y_true) / (y_true[:-1] + 1e-10)
         return pred_returns, actual_returns
 
     def _calculate_directional_accuracy(
@@ -88,7 +90,22 @@ class EvaluateModel:
         sharpe = np.mean(strategy_returns) / (np.std(strategy_returns) + 1e-10)
         return sharpe
 
-    def evaluate(self):
+    def _save_comparision_graph(self, y_true: np.ndarray, y_pred: np.ndarray):
+        """Save a comparison graph of true vs predicted values"""
+        path = "artifacts/graphs.png"
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        plt.figure(figsize=(12, 6))
+        plt.plot(y_true, label="True Values", color="blue")
+        plt.plot(y_pred, label="Predicted Values", color="orange")
+        plt.title("True vs Predicted Values")
+        plt.xlabel("Time Steps")
+        plt.ylabel("Values")
+        plt.legend()
+        plt.grid()
+        plt.savefig(path)
+        plt.close()
+
+    def evaluate(self) -> Dict[str, float]:
         self.model.eval()
         scaled_y_true, scaled_y_pred = self._get_predictions()
         y_true = inverse_transform_predictions(np.array(scaled_y_true), self.scaler)
@@ -114,5 +131,10 @@ class EvaluateModel:
             results["MagnitudeCorrelation"] = self._calculate_magnitude_correlation(
                 y_true, y_pred
             )
-        if "ShapreRatio" in selected_metrics:
+        if "SharpeRatio" in selected_metrics:
             results["SharpeRatio"] = self._calculate_sharpe(y_true, y_pred)
+
+        if self.config.save_graph:
+            self._save_comparision_graph(y_true, y_pred)
+
+        return results

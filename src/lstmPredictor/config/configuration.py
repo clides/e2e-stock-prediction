@@ -81,4 +81,8 @@ class EvaluationConfigurationManager:
         self.params = read_yaml(params_path)
 
     def get_evaluation_config(self) -> EvaluationConfig:
-        return EvaluationConfig(metrics=self.params.evaluation.metrics)
+        return EvaluationConfig(
+            metrics=self.params.evaluation.metrics,
+            log_scores=self.params.evaluation.log_scores,
+            save_graph=self.params.evaluation.save_graph,
+        )
