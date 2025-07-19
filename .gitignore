@@ -149,3 +149,4 @@ coverage/
 *.swo
 *.egg-info/
 artifacts/*
+mlruns/*

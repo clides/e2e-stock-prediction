@@ -54,5 +54,5 @@ class TrainingConfig:
 @dataclass
 class EvaluationConfig:
     metrics: Dict[str, bool]
-    log_scores: bool
+    log_model: bool
     save_graph: bool

@@ -2,6 +2,7 @@ import os
 from typing import Dict, Tuple
 
 import matplotlib.pyplot as plt
+import mlflow
 import numpy as np
 import torch
 from sklearn.preprocessing import MinMaxScaler
@@ -9,7 +10,12 @@ from torch import nn
 from torch.utils.data import DataLoader
 
 from lstmPredictor.config.configuration import EvaluationConfig
-from lstmPredictor.utils.common import get_device, inverse_transform_predictions
+from lstmPredictor.constants import PARAMS_FILE_PATH
+from lstmPredictor.utils.common import (
+    get_device,
+    inverse_transform_predictions,
+    read_yaml,
+)
 
 
 class EvaluateModel:
@@ -105,6 +111,40 @@ class EvaluateModel:
         plt.savefig(path)
         plt.close()
 
+    def _log_model(self, metrics: Dict[str, float]):
+        """Log the model, parameters, and metrics to MLflow"""
+        from datetime import datetime
+
+        config = read_yaml(PARAMS_FILE_PATH)
+        data_ingestion = dict(config.data_ingestion)
+        base_model = dict(config.base_model)
+        data_preprocessing = dict(config.data_preprocessing)
+        training = dict(config.training)
+
+        params = {}
+        random_seed = base_model["seed"]
+        del base_model["seed"]
+        del data_preprocessing["seed"]
+        del training["seed"]
+        params.update(data_ingestion)
+        params.update(base_model)
+        params.update(data_preprocessing)
+        params.update(training)
+        params["random_seed"] = random_seed
+
+        experiment_name = f"LSTM Stock Price Prediction for {data_ingestion['ticker']}"
+        run_name = f"{data_ingestion['ticker']} {datetime.now().strftime('%Y-%m-%d')}"
+        mlflow.set_experiment(experiment_name)
+
+        with mlflow.start_run(run_name=run_name):
+            mlflow.log_params(params)
+            mlflow.log_metrics(metrics)
+            mlflow.pytorch.log_model(
+                pytorch_model=self.model,
+                artifact_path="model",
+                registered_model_name=f"{data_ingestion['ticker']} Stock Price Predictor (Trained on {datetime.now().strftime('%Y-%m-%d')})",
+            )
+
     def evaluate(self) -> Dict[str, float]:
         self.model.eval()
         scaled_y_true, scaled_y_pred = self._get_predictions()
@@ -136,5 +176,7 @@ class EvaluateModel:
 
         if self.config.save_graph:
             self._save_comparision_graph(y_true, y_pred)
+        if self.config.log_model:
+            self._log_model(results)
 
         return results

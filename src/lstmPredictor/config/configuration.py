@@ -86,6 +86,6 @@ class EvaluationConfigurationManager:
     def get_evaluation_config(self) -> EvaluationConfig:
         return EvaluationConfig(
             metrics=self.params.evaluation.metrics,
-            log_scores=self.params.evaluation.log_scores,
+            log_model=self.params.evaluation.log_model,
             save_graph=self.params.evaluation.save_graph,
         )
