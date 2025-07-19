@@ -96,9 +96,11 @@ class EvaluateModel:
         sharpe = np.mean(strategy_returns) / (np.std(strategy_returns) + 1e-10)
         return sharpe
 
-    def _save_comparision_graph(self, y_true: np.ndarray, y_pred: np.ndarray):
+    def _save_comparision_graph(
+        self, y_true: np.ndarray, y_pred: np.ndarray, name: str
+    ):
         """Save a comparison graph of true vs predicted values"""
-        path = "artifacts/graphs.png"
+        path = f"artifacts/{name}.png"
         os.makedirs(os.path.dirname(path), exist_ok=True)
         plt.figure(figsize=(12, 6))
         plt.plot(y_true, label="True Values", color="blue")
@@ -111,7 +113,9 @@ class EvaluateModel:
         plt.savefig(path)
         plt.close()
 
-    def _log_model(self, metrics: Dict[str, float]):
+    def _log_model(
+        self, y_true: np.ndarray, y_pred: np.ndarray, metrics: Dict[str, float]
+    ):
         """Log the model, parameters, and metrics to MLflow"""
         from datetime import datetime
 
@@ -144,6 +148,13 @@ class EvaluateModel:
                 artifact_path="model",
                 registered_model_name=f"{data_ingestion['ticker']} Stock Price Predictor (Trained on {datetime.now().strftime('%Y-%m-%d')})",
             )
+            if self.config.save_graph:
+                graph_name = f"{data_ingestion['ticker']}-evaluation-comparison[{datetime.now().strftime('%Y-%m-%d')}]"
+                self._save_comparision_graph(y_true, y_pred, graph_name)
+                mlflow.log_artifact(
+                    "artifacts/" + graph_name + ".png",
+                    artifact_path="evaluation-graphs",
+                )
 
     def evaluate(self) -> Dict[str, float]:
         self.model.eval()
@@ -174,9 +185,7 @@ class EvaluateModel:
         if "SharpeRatio" in selected_metrics:
             results["SharpeRatio"] = self._calculate_sharpe(y_true, y_pred)
 
-        if self.config.save_graph:
-            self._save_comparision_graph(y_true, y_pred)
         if self.config.log_model:
-            self._log_model(results)
+            self._log_model(y_true, y_pred, results)
 
         return results
