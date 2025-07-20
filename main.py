@@ -4,6 +4,7 @@ from lstmPredictor.pipeline.stage_02_base_model import BaseModelPipeline
 from lstmPredictor.pipeline.stage_03_data_preprocessing import DataPreprocessingPipeline
 from lstmPredictor.pipeline.stage_04_training import TrainingPipeline
 from lstmPredictor.pipeline.stage_05_evaluation import EvaluationPipeline
+from lstmPredictor.pipeline.stage_06_inference import MakePredictionsPipeline
 from lstmPredictor.utils.common import load_ptmodel
 
 # Stage 1: Data Ingestion
@@ -68,4 +69,17 @@ try:
     logger.info(">>>>>> (5) Model Evaluation Stage completed <<<<<<")
 except Exception as e:
     logger.exception(f"Error in (5) Model Evaluation Stage: {str(e)}")
+    raise e
+
+# Stage 6: Make Predictions
+try:
+    logger.info(">>>>>> (6) Model Prediction Stage started <<<<<<")
+    prediction_pipeline = MakePredictionsPipeline(
+        model=best_model,
+        scaler=scaler,
+    )
+    prediction = prediction_pipeline.run()
+    logger.info(">>>>>> (6) Model Prediction Stage completed <<<<<<")
+except Exception as e:
+    logger.exception(f"Error in (5) Model Prediction Stage: {str(e)}")
     raise e

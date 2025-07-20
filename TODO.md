@@ -3,7 +3,7 @@
 2. Separate actual config from params
 
 # To Do
-1. Add model inference pipeline
+1. Add graph for model inference
 2. Add unittests with github actions
 3. Add REST API with FastAPI
 

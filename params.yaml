@@ -50,5 +50,5 @@ evaluation:
     "MagCorr": True,
     "SharpeRatio": True,
   }
-  log_model: True
+  log_model: False
   save_graph: True
