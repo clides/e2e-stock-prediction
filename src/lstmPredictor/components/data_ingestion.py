@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from typing import Any
 
 import pandas as pd
 import yfinance as yf
@@ -9,14 +10,21 @@ from lstmPredictor.utils.common import validate_date, validate_ticker
 
 
 class StockDataIngestion:
-    def __init__(self, config: DataIngestionConfig):
+    def __init__(self, config: DataIngestionConfig, **kwargs: Any):
         """
         Initialize with a validated DataIngestionConfig object.
         """
         self.config = config
         self.raw_data_dir = config.raw_data_dir
-        self.ticker = config.ticker
-        self.start_date = datetime.now() - timedelta(days=config.num_days)
+        if kwargs.get("ticker", None):
+            self.ticker = kwargs["ticker"]
+        else:
+            self.ticker = config.ticker
+        if kwargs.get("num_days", None):
+            num_days = kwargs["num_days"]
+        else:
+            num_days = config.num_days
+        self.start_date = datetime.now() - timedelta(days=num_days)
 
         validate_date(self.start_date.strftime("%Y-%m-%d"))
         validate_ticker(self.ticker)
